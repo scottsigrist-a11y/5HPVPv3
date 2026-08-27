@@ -6,603 +6,574 @@
     <title>Meta Glasses 5-Hand Video Poker</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #ffffff;
-            --card-txt: #000000;
-            --accent-color: #2563eb;
-            --focus-color: #f59e0b;
-            --text-main: #f8fafc;
+            --bg-color: #0b2512;
+            --felt-color: #144020;
+            --gold: #ffd700;
+            --card-white: #ffffff;
+            --card-red: #ff3333;
+            --text-white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
+            background-image: radial-gradient(circle, var(--felt-color) 0%, var(--bg-color) 100%);
+            color: var(--text-white);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
             margin: 0;
-            padding: 10px;
+            padding: 15px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            box-sizing: border-box;
+            justify-content: space-between;
+            height: 100vh;
         }
 
-        /* Top Info Bar */
-        .hud-bar {
+        /* Top HUD Section */
+        #hud-container {
+            width: 100%;
+            max-width: 600px;
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .hud-item {
+            font-size: 16px;
             font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* Instructions optimized for Meta Wristband mapping */
-        .instructions {
-            font-size: 11px;
-            color: #94a3b8;
-            text-align: center;
-            max-width: 600px;
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.3);
-            padding: 6px;
-            border-radius: 6px;
-            width: 100%;
-            box-sizing: border-box;
+        .hud-value {
+            color: var(--gold);
         }
 
-        /* Main Game Layout */
-        .game-container {
+        /* Paytable Notification Area */
+        #status-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--gold);
+            min-height: 24px;
+            margin: 10px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* Main Hands Layout Area */
+        #hands-container {
             display: flex;
             flex-direction: column;
+            gap: 8px;
             width: 100%;
-            max-width: 600px;
-            gap: 12px;
+            max-width: 500px;
+            flex-grow: 1;
+            justify-content: center;
         }
 
-        /* Main Hand Container */
-        .main-hand-section {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .section-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #38bdf8;
-            margin-top: 0;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        /* Interactive Grid for Meta Navigation */
-        .interactive-grid {
+        .poker-hand {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 6px;
         }
 
-        /* Accessible Focus Button wrapper for Cards */
-        .card-button {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 0;
-            margin: 0;
+        /* Card Button Framework - Custom focus tracking for Meta Glass Swipes */
+        .card-btn {
+            background: var(--card-white);
+            color: #000000;
+            border: 3px solid transparent;
+            border-radius: 6px;
+            width: 17%;
+            aspect-ratio: 2.5 / 3.5;
+            max-width: 75px;
+            min-height: 75px;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            border-radius: 8px;
             outline: none;
-            transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
         }
 
-        /* Meta Wristband Focus state highlight */
-        .card-button:focus {
-            transform: scale(1.05);
-            box-shadow: 0 0 0 4px var(--focus-color);
+        /* Visual indicator for Meta Neural Band swipe focus */
+        .card-btn:focus, .card-btn:hover {
+            border-color: var(--gold);
+            transform: scale(1.06);
+            box-shadow: 0 0 15px var(--gold);
             z-index: 10;
         }
 
-        /* Card Visual Wrapper */
-        .card-inner {
-            background-color: var(--card-bg);
-            color: var(--card-txt);
-            border-radius: 6px;
-            aspect-ratio: 2.5 / 3.5;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 6px;
-            box-sizing: border-box;
-            font-weight: bold;
-            font-size: 16px;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        /* Custom treatment for the single baseline interactive decision layer */
+        .main-hand .card-btn {
+            cursor: pointer;
+        }
+        
+        .sub-hand .card-btn {
+            cursor: not-allowed;
+            opacity: 0.9;
         }
 
-        .card-inner.red-suit {
-            color: #dc2626;
+        .card-btn.held {
+            background: #e6f2ff;
+            border-color: #2196f3 !important;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
         }
 
-        .card-suit-center {
-            font-size: 24px;
-            align-self: center;
+        .suit-top { text-align: left; font-size: 14px; }
+        .suit-center { font-size: 24px; text-align: center; line-height: 1; }
+        .suit-bottom { text-align: right; font-size: 14px; transform: rotate(180deg); }
+
+        .red-suit {
+            color: var(--card-red);
         }
 
-        .card-suit-bottom {
-            align-self: flex-end;
-            transform: rotate(180deg);
-        }
-
-        /* Hold Indicator Overlay */
-        .hold-badge {
+        /* Hold Indicators Overlay Layer */
+        .hold-tab {
             position: absolute;
-            top: -6px;
+            top: -12px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #10b981;
+            background: #2196f3;
             color: white;
-            font-size: 10px;
+            font-size: 9px;
             padding: 2px 6px;
             border-radius: 4px;
-            text-transform: uppercase;
             font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
             display: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .card-button.held .hold-badge {
+        .card-btn.held .hold-tab {
             display: block;
         }
 
-        /* Action Buttons Row */
-        .controls-row {
+        /* Action Buttons Area */
+        #controls-container {
+            width: 100%;
+            max-width: 600px;
             display: flex;
-            gap: 10px;
             justify-content: center;
-            margin-top: 5px;
+            margin-bottom: 10px;
         }
 
-        .action-btn {
-            flex: 1;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 12px;
-            font-size: 16px;
+        #action-btn {
+            background: linear-gradient(185deg, #ffe042 0%, var(--gold) 100%);
+            color: #000000;
+            border: 3px solid transparent;
+            padding: 14px 45px;
+            font-size: 20px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 30px;
             cursor: pointer;
             outline: none;
-            transition: background-color 0.15s, box-shadow 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            transition: transform 0.1s, border-color 0.1s;
         }
 
-        /* Meta Wristband Focus state highlight for Actions */
-        .action-btn:focus {
-            background-color: #1d4ed8;
-            box-shadow: 0 0 0 4px var(--focus-color);
+        #action-btn:focus, #action-btn:hover {
+            border-color: var(--text-white);
+            box-shadow: 0 0 20px var(--gold);
+            transform: scale(1.05);
         }
 
-        /* Multi-Hand Grid (The other 4 hands) */
-        .multi-hands-container {
+        /* Startup Focus Trapping Overlay Block */
+        #focus-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 37, 18, 0.95);
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        .sub-hand {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.03);
-            padding: 6px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .hand-label {
-            font-size: 11px;
-            color: #94a3b8;
-            width: 50px;
-        }
-
-        .mini-cards {
-            display: flex;
-            gap: 4px;
-            flex: 1;
             justify-content: center;
+            z-index: 100;
+            cursor: pointer;
+            padding: 20px;
         }
 
-        .mini-card {
-            background-color: #334155;
-            color: #f8fafc;
-            font-size: 11px;
-            padding: 4px 6px;
-            border-radius: 4px;
-            min-width: 24px;
+        .modal-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--gold);
             text-align: center;
-            font-weight: bold;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        .mini-card.red-suit {
-            background-color: #fef2f2;
-            color: #dc2626;
+        .modal-box h2 {
+            color: var(--gold);
+            margin-top: 0;
         }
 
-        .hand-result {
-            font-size: 11px;
-            font-weight: bold;
-            width: 90px;
-            text-align: right;
-            color: #10b981;
+        .modal-box p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #cccccc;
+            margin-bottom: 20px;
         }
-        
-        .hand-result.no-win {
-            color: #64748b;
+
+        .start-btn {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <!-- HUD State info bar -->
-    <div class="hud-bar">
-        <div>CREDITS: <span id="label-credits">4000</span></div>
-        <div>BET: <span id="label-bet">25</span></div>
-        <div>WON: <span id="label-won">0</span></div>
+    <!-- Overlay ensuring browser window activation before listening to wristband keys -->
+    <div id="focus-overlay" onclick="launchGameEngine()">
+        <div class="modal-box">
+            <h2>5-Hand Video Poker</h2>
+            <p><strong>Glasses Controls:</strong> Swipe your wristband left/right to browse cards. Pinch index finger to lock holds or trigger deal.</p>
+            <button class="start-btn">ENABLE SMART CONTROLS</button>
+        </div>
     </div>
 
-    <!-- Meta Gesture Instruction Bar -->
-    <div class="instructions">
-        Wristband Gesture: Swipe Left/Right to browse cards or buttons. Index Pinch (Enter) to toggle Hold / Deal.
+    <!-- Top Stats Display Grid -->
+    <div id="hud-container">
+        <div class="hud-item">CREDITS: <span id="stat-credits" class="hud-value">4000</span></div>
+        <div class="hud-item">BET: <span id="stat-bet" class="hud-value">25</span></div>
+        <div class="hud-item">WON: <span id="stat-won" class="hud-value">0</span></div>
     </div>
 
-    <div class="game-container">
-        
-        <!-- Other 4 Hands in the 5-Hand setup -->
-        <div class="multi-hands-container">
-            <div class="sub-hand" id="hand-1">
-                <span class="hand-label">Hand 2</span>
-                <div class="mini-cards"><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div></div>
-                <span class="hand-result no-win">—</span>
-            </div>
-            <div class="sub-hand" id="hand-2">
-                <span class="hand-label">Hand 3</span>
-                <div class="mini-cards"><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div></div>
-                <span class="hand-result no-win">—</span>
-            </div>
-            <div class="sub-hand" id="hand-3">
-                <span class="hand-label">Hand 4</span>
-                <div class="mini-cards"><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div></div>
-                <span class="hand-result no-win">—</span>
-            </div>
-            <div class="sub-hand" id="hand-4">
-                <span class="hand-label">Hand 5</span>
-                <div class="mini-cards"><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div></div>
-                <span class="hand-result no-win">—</span>
-            </div>
-        </div>
+    <div id="status-display">JACKS OR BETTER MULTI-HAND</div>
 
-        <!-- Main Decision Hand (Hand 1) -->
-        <div class="main-hand-section">
-            <p class="section-title">Main Hand (Set Holds)</p>
-            <div class="interactive-grid" id="main-cards-row">
-                <!-- Card 0 -->
-                <button class="card-button" data-card-idx="0">
-                    <span class="hold-badge">Hold</span>
-                    <div class="card-inner" id="card-0">
-                        <span class="card-val-top">—</span>
-                        <span class="card-suit-center"></span>
-                        <span class="card-suit-bottom"></span>
-                    </div>
-                </button>
-                <!-- Card 1 -->
-                <button class="card-button" data-card-idx="1">
-                    <span class="hold-badge">Hold</span>
-                    <div class="card-inner" id="card-1">
-                        <span class="card-val-top">—</span>
-                        <span class="card-suit-center"></span>
-                        <span class="card-suit-bottom"></span>
-                    </div>
-                </button>
-                <!-- Card 2 -->
-                <button class="card-button" data-card-idx="2">
-                    <span class="hold-badge">Hold</span>
-                    <div class="card-inner" id="card-2">
-                        <span class="card-val-top">—</span>
-                        <span class="card-suit-center"></span>
-                        <span class="card-suit-bottom"></span>
-                    </div>
-                </button>
-                <!-- Card 3 -->
-                <button class="card-button" data-card-idx="3">
-                    <span class="hold-badge">Hold</span>
-                    <div class="card-inner" id="card-3">
-                        <span class="card-val-top">—</span>
-                        <span class="card-suit-center"></span>
-                        <span class="card-suit-bottom"></span>
-                    </div>
-                </button>
-                <!-- Card 4 -->
-                <button class="card-button" data-card-idx="4">
-                    <span class="hold-badge">Hold</span>
-                    <div class="card-inner" id="card-4">
-                        <span class="card-val-top">—</span>
-                        <span class="card-suit-center"></span>
-                        <span class="card-suit-bottom"></span>
-                    </div>
-                </button>
-            </div>
-        </div>
+    <!-- Game Visual Engine Canvas Wrapper Alternative -->
+    <div id="hands-container">
+        <!-- Sub Hands 1-4 (Replicated evaluation spaces layout) -->
+        <div class="poker-hand sub-hand" id="hand-1"></div>
+        <div class="poker-hand sub-hand" id="hand-2"></div>
+        <div class="poker-hand sub-hand" id="hand-3"></div>
+        <div class="poker-hand sub-hand" id="hand-4"></div>
+        <!-- Baseline Control Input Primary Hand Layer -->
+        <div class="poker-hand main-hand" id="hand-0"></div>
+    </div>
 
-        <!-- Meta Interaction UI Buttons -->
-        <div class="controls-row">
-            <button class="action-btn" id="btn-deal">Deal</button>
-        </div>
+    <!-- Active Structural Interactive Trigger Grid Area -->
+    <div id="controls-container">
+        <button id="action-btn">DEAL</button>
     </div>
 
     <script>
-        // --- GAME STATE ---
-        let credits = 4000;
-        let betPerHand = 5;
-        let totalBet = betPerHand * 5; // 25 total
-        let gameStage = 'DEAL'; // 'DEAL' or 'DRAW'
-        
+        // --- 1. CARD MATRIX ENGINE SETUP ---
+        const SUITS = [
+            { symbol: '♠', name: 'spades', isRed: false },
+            { symbol: '♥', name: 'hearts', isRed: true },
+            { symbol: '♦', name: 'diamonds', isRed: true },
+            { symbol: '♣', name: 'clubs', isRed: false }
+        ];
+        const VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        const VALUES_RANK = { '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, 'J':11, 'Q':12, 'K':13, 'A':14 };
+
         let deck = [];
-        let mainHand = [];
-        let heldIndices = [false, false, false, false, false];
-        let subHands = [[], [], [], []];
+        let credits = 4000;
+        let isDrawState = false;
+        
+        // Multi-hand structures tracking 5 parallel lists
+        let playerHands = [[], [], [], [], []];
+        let cardHeldStates = [false, false, false, false, false];
 
-        const suits = ['♠', '♥', '♦', '♣'];
-        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-        const suitNames = {'♠': 'spades', '♥': 'hearts', '♦': 'diams', '♣': 'clubs'};
+        // Focus ring linear target sequencing maps
+        let interactableElements = [];
+        let activeFocusIndex = 0;
 
-        // --- CORE LOGIC ---
+        const actionButton = document.getElementById('action-btn');
+        const overlay = document.getElementById('focus-overlay');
+
+        // --- 2. GAMESTATE ENGINE LOGIC ---
         function createDeck() {
-            let newDeck = [];
-            for (let suit of suits) {
-                for (let val of values) {
-                    newDeck.push({ value: val, suit: suit });
+            deck = [];
+            for (let suit of SUITS) {
+                for (let val of VALUES) {
+                    deck.push({ value: val, suit: suit });
                 }
             }
-            return newDeck;
         }
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
+        function shuffleDeck() {
+            for (let i = deck.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function initGame() {
-            deck = createDeck();
-            shuffle(deck);
-            
-            // Set initial programmatic focus to the first card button
-            // This ensures immediate Meta Wristband tracking connectivity on load
-            setTimeout(() => {
-                document.querySelector('.card-button').focus();
-            }, 300);
-        }
-
-        // Handle Card Selection or Deal Actions
-        function handleAction() {
-            if (gameStage === 'DEAL') {
-                triggerDealPhase();
-            } else if (gameStage === 'DRAW') {
-                triggerDrawPhase();
+                [deck[i], deck[j]] = [deck[j], deck[i]];
             }
         }
 
-        function triggerDealPhase() {
-            if (credits < totalBet) {
-                alert("Insufficient Credits!");
-                return;
-            }
-            credits -= totalBet;
-            document.getElementById('label-credits').innerText = credits;
-            document.getElementById('label-won').innerText = "0";
-
-            deck = createDeck();
-            shuffle(deck);
-
-            // Deal 5 main cards
-            mainHand = [];
-            heldIndices = [false, false, false, false, false];
-            
-            for (let i = 0; i < 5; i++) {
-                mainHand.push(deck.pop());
-                const cardBtn = document.querySelector(`[data-card-idx="${i}"]`);
-                cardBtn.classList.remove('held');
-            }
-
-            renderMainHand();
-            clearSubHands();
-
-            gameStage = 'DRAW';
-            document.getElementById('btn-deal').innerText = 'Draw / Next Hand';
+        function dealCard() {
+            return deck.pop();
         }
 
-        function triggerDrawPhase() {
-            let totalWinnings = 0;
-
-            // 1. Process Main Hand
-            let finalMainHand = [...mainHand];
-            for(let i=0; i<5; i++) {
-                if(!heldIndices[i]) {
-                    finalMainHand[i] = deck.pop();
+        // Generate base markup structures directly map focus vectors natively
+        function initializeHandLayouts() {
+            for (let h = 0; h < 5; h++) {
+                const handRow = document.getElementById(`hand-${h}`);
+                handRow.innerHTML = '';
+                for (let c = 0; c < 5; c++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'card-btn';
+                    // Base hand holds can be toggled by user input vectors
+                    if (h === 0) {
+                        btn.setAttribute('data-card-idx', c);
+                    } else {
+                        btn.disabled = true; // Sub-hands evaluate non-interactively
+                    }
+                    handRow.appendChild(btn);
                 }
             }
-            mainHand = finalMainHand;
-            renderMainHand();
-            
-            let mainResult = evaluateHand(mainHand);
-            totalWinnings += mainResult.payout * betPerHand;
+        }
 
-            // 2. Process Remaining 4 Hands
-            for(let h=0; h<4; h++) {
-                let currentSubHand = [];
-                for(let i=0; i<5; i++) {
-                    if(heldIndices[i]) {
-                        currentSubHand.push(mainHand[i]);
+        function renderAllHands() {
+            for (let h = 0; h < 5; h++) {
+                const handRow = document.getElementById(`hand-${h}`);
+                const buttons = handRow.querySelectorAll('.card-btn');
+                for (let c = 0; c < 5; c++) {
+                    const card = playerHands[h][c];
+                    const btn = buttons[c];
+                    
+                    if (!card) {
+                        btn.innerHTML = '';
+                        continue;
+                    }
+
+                    const redClass = card.suit.isRed ? 'class="red-suit"' : '';
+                    btn.innerHTML = `
+                        <span class="hold-tab">HELD</span>
+                        <div class="suit-top" ${redClass}>${card.value}${card.suit.symbol}</div>
+                        <div class="suit-center" ${redClass}>${card.suit.symbol}</div>
+                        <div class="suit-bottom" ${redClass}>${card.value}${card.suit.symbol}</div>
+                    `;
+
+                    // Keep baseline visibility clean
+                    if (h === 0 && cardHeldStates[c]) {
+                        btn.classList.add('held');
                     } else {
-                        currentSubHand.push(deck.pop());
+                        btn.classList.remove('held');
                     }
                 }
-                subHands[h] = currentSubHand;
-                let subResult = evaluateHand(currentSubHand);
-                totalWinnings += subResult.payout * betPerHand;
-                
-                renderSubHand(h+1, currentSubHand, subResult.name);
-            }
-
-            credits += totalWinnings;
-            document.getElementById('label-credits').innerText = credits;
-            document.getElementById('label-won').innerText = totalWinnings;
-
-            gameStage = 'DEAL';
-            document.getElementById('btn-deal').innerText = 'Deal ($25)';
-            
-            // Refocus back onto Deal button for rapid workflow progression
-            document.getElementById('btn-deal').focus();
-        }
-
-        function toggleHold(idx) {
-            if (gameStage !== 'DRAW') return; // Can only hold during draw phase
-            heldIndices[idx] = !heldIndices[idx];
-            const cardBtn = document.querySelector(`[data-card-idx="${idx}"]`);
-            if(heldIndices[idx]) {
-                cardBtn.classList.add('held');
-            } else {
-                cardBtn.classList.remove('held');
             }
         }
 
-        // --- RENDERING ---
-        function renderMainHand() {
-            for (let i = 0; i < 5; i++) {
-                const card = mainHand[i];
-                const cardElem = document.getElementById(`card-${i}`);
-                
-                cardElem.querySelector('.card-val-top').innerText = card.value;
-                cardElem.querySelector('.card-suit-center').innerText = card.suit;
-                cardElem.querySelector('.card-suit-bottom').innerText = card.suit;
-
-                if (card.suit === '♥' || card.suit === '♦') {
-                    cardElem.classList.add('red-suit');
-                } else {
-                    cardElem.classList.remove('red-suit');
+        // Core round switcher flow
+        function executeAction() {
+            if (!isDrawState) {
+                // Initial Deal execution path
+                if (credits < 25) {
+                    document.getElementById('status-display').textContent = "NOT ENOUGH CREDITS!";
+                    return;
                 }
-            }
-        }
+                credits -= 25;
+                document.getElementById('stat-credits').textContent = credits;
+                document.getElementById('stat-won').textContent = "0";
 
-        function renderSubHand(handNum, handCards, resultName) {
-            const row = document.getElementById(`hand-${handNum}`);
-            const cardsContainer = row.querySelector('.mini-cards');
-            cardsContainer.innerHTML = '';
-            
-            handCards.forEach(card => {
-                const miniCard = document.createElement('div');
-                miniCard.className = 'mini-card';
-                if(card.suit === '♥' || card.suit === '♦') miniCard.classList.add('red-suit');
-                miniCard.innerText = card.value + card.suit;
-                cardsContainer.appendChild(miniCard);
-            });
+                createDeck();
+                shuffleDeck();
 
-            const resultElem = row.querySelector('.hand-result');
-            resultElem.innerText = resultName;
-            if(resultName === 'No Win') {
-                resultElem.className = 'hand-result no-win';
+                // Clear constraints
+                cardHeldStates = [false, false, false, false, false];
+                
+                // Deal to baseline hands tracking structure
+                playerHands[0] = [dealCard(), dealCard(), dealCard(), dealCard(), dealCard()];
+                
+                // Mirror layout states into top subhands for standard multiplay setup
+                for (let h = 1; h < 5; h++) {
+                    playerHands[h] = [...playerHands[0]];
+                }
+
+                isDrawState = true;
+                actionButton.textContent = "DRAW";
+                document.getElementById('status-display').textContent = "SELECT CARDS TO HOLD";
             } else {
-                resultElem.className = 'hand-result';
+                // Draw sequence loop
+                // Keep base card modifications separate across all 5 independent deck processing loops
+                for (let h = 0; h < 5; h++) {
+                    for (let c = 0; c < 5; c++) {
+                        if (h === 0) {
+                            if (!cardHeldStates[c]) playerHands[0][c] = dealCard();
+                        } else {
+                            // Subhands retain whatever structural holds base layer assigned, replacing open values independently
+                            if (!cardHeldStates[c]) playerHands[h][c] = dealCard();
+                        }
+                    }
+                }
+
+                // Evaluate scores across all 5 distinct environments
+                let totalWin = 0;
+                let outcomeTexts = [];
+                
+                for (let h = 0; h < 5; h++) {
+                    const score = evaluatePokerHand(playerHands[h]);
+                    totalWin += score.payout;
+                    if(h === 0) outcomeTexts.push(score.label);
+                }
+
+                credits += totalWin;
+                document.getElementById('stat-credits').textContent = credits;
+                document.getElementById('stat-won').textContent = totalWin;
+                document.getElementById('status-display').textContent = `MAIN HAND: ${outcomeTexts[0]} | WON: ${totalWin}`;
+
+                isDrawState = false;
+                actionButton.textContent = "DEAL";
             }
+            renderAllHands();
+            rebuildFocusSequenceMap();
         }
 
-        function clearSubHands() {
-            for(let i=1; i<=4; i++) {
-                const row = document.getElementById(`hand-${i}`);
-                row.querySelector('.mini-cards').innerHTML = '<div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div><div class="mini-card">—</div>';
-                const res = row.querySelector('.hand-result');
-                res.innerText = '—';
-                res.className = 'hand-result no-win';
-            }
-        }
-
-        // --- HAND EVALUATION (Jacks or Better standard) ---
-        function evaluateHand(hand) {
-            const order = "2345678910JQKA";
-            let valCounts = {};
-            let suitCounts = {};
-            
+        // Basic structural payout mapping engine
+        function evaluatePokerHand(hand) {
+            const counts = {};
+            const suitsCount = {};
             hand.forEach(c => {
-                valCounts[c.value] = (valCounts[c.value] || 0) + 1;
-                suitCounts[c.suit] = (suitCounts[c.suit] || 0) + 1;
+                counts[c.value] = (counts[c.value] || 0) + 1;
+                suitsCount[c.suit.name] = (suitsCount[c.suit.name] || 0) + 1;
             });
 
-            let counts = Object.values(valCounts).sort((a,b)=>b-a);
-            let isFlush = Object.keys(suitCounts).length === 1;
+            const valuesSorted = hand.map(c => VALUES_RANK[c.value]).sort((a,b) => a-b);
             
-            // Check Straight
-            let indices = hand.map(c => order.indexOf(c.value)).sort((a,b)=>a-b);
+            // Check flags
+            const isFlush = Object.keys(suitsCount).length === 1;
             let isStraight = false;
-            if (Object.keys(valCounts).length === 5) {
-                if (indices[4] - indices[0] === 4) isStraight = true;
-                // Ace low straight exception (A-2-3-4-5)
-                if (indices.join(',') === '0,1,2,3,12') isStraight = true;
-            }
-
-            if (isStraight && isFlush) {
-                if (valCounts['A'] && valCounts['K']) return { name: 'Royal Flush', payout: 250 };
-                return { name: 'Straight Flush', payout: 50 };
-            }
-            if (counts[0] === 4) return { name: 'Four of a Kind', payout: 25 };
-            if (counts[0] === 3 && counts[1] === 2) return { name: 'Full House', payout: 9 };
-            if (isFlush) return { name: 'Flush', payout: 6 };
-            if (isStraight) return { name: 'Straight', payout: 4 };
-            if (counts[0] === 3) return { name: 'Three of a Kind', payout: 3 };
-            if (counts[0] === 2 && counts[1] === 2) return { name: 'Two Pair', payout: 2 };
             
-            if (counts[0] === 2) {
-                // Jacks or Better verification
-                let pairValue = Object.keys(valCounts).find(k => valCounts[k] === 2);
-                if (['J', 'Q', 'K', 'A'].includes(pairValue)) {
-                    return { name: 'Jacks or Better', payout: 1 };
+            // Handle uniquely ordered lists checks
+            const uniqueVals = [...new Set(valuesSorted)];
+            if (uniqueVals.length === 5) {
+                if (valuesSorted[4] - valuesSorted[0] === 4) isStraight = true;
+                // Ace low configuration check (A,2,3,4,5)
+                if (valuesSorted[4] === 14 && valuesSorted[0] === 2 && valuesSorted[1] === 3 && valuesSorted[2] === 4 && valuesSorted[3] === 5) {
+                    isStraight = true;
                 }
             }
+
+            const freq = Object.values(counts).sort((a,b) => b-a);
             
-            return { name: 'No Win', payout: 0 };
+            if (isFlush && isStraight) {
+                if (valuesSorted[4] === 14 && valuesSorted[3] === 13) return { payout: 250, label: "ROYAL FLUSH" };
+                return { payout: 50, label: "STRAIGHT FLUSH" };
+            }
+            if (freq[0] === 4) return { payout: 25, label: "FOUR OF A KIND" };
+            if (freq[0] === 3 && freq[1] === 2) return { payout: 9, label: "FULL HOUSE" };
+            if (isFlush) return { payout: 6, label: "FLUSH" };
+            if (isStraight) return { payout: 4, label: "STRAIGHT" };
+            if (freq[0] === 3) return { payout: 3, label: "THREE OF A KIND" };
+            if (freq[0] === 2 && freq[1] === 2) return { payout: 2, label: "TWO PAIR" };
+            
+            if (freq[0] === 2) {
+                // Verify high value pairs
+                let highPair = false;
+                for (let v in counts) {
+                    if (counts[v] === 2 && ['J','Q','K','A'].includes(v)) highPair = true;
+                }
+                if (highPair) return { payout: 1, label: "JACKS OR BETTER" };
+            }
+
+            return { payout: 0, label: "HIGH CARD" };
         }
 
-        // --- META WRISTBAND NATIVE INTERFACE CHANNEL ---
-        // Bind programmatic interactions onto standard document focus bindings.
-        // The Meta Wearable browser automatically moves document focus when 
-        // the user performs swiping gestures on the wristband. Tapping/Pinching fires "Enter".
-        
-        // 1. Handle selection/holds when clicking or pinching a card button
-        document.querySelectorAll('.card-button').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(e.currentTarget.getAttribute('data-card-idx'));
-                toggleHold(idx);
-            });
+        // --- 3. HARDWARE CAPTURING LAYER (META GLASSES BRIDGING INTERFACE) ---
+        function rebuildFocusSequenceMap() {
+            // Re-aggregate list items target grids safely
+            const mainHandButtons = document.getElementById('hand-0').querySelectorAll('.card-btn');
+            
+            if (isDrawState) {
+                // While holding cards, map focuses circularly over base cards + actionable deal triggers
+                interactableElements = [...mainHandButtons, actionButton];
+            } else {
+                // If round resets, trap focus entirely onto action bar to enforce simplified loop mechanics
+                interactableElements = [actionButton];
+            }
+            
+            // Sanitize tracking indices boundaries gracefully
+            if (activeFocusIndex >= interactableElements.length) {
+                activeFocusIndex = 0;
+            }
+            interactableElements[activeFocusIndex].focus();
+        }
+
+        function launchGameEngine() {
+            overlay.style.display = 'none';
+            initializeHandLayouts();
+            rebuildFocusSequenceMap();
+            
+            // Explicit programmatic focus drop locks native element intercept sequences safely
+            setTimeout(() => {
+                interactableElements[activeFocusIndex].focus();
+            }, 100);
+        }
+
+        // Map base interactions to support standard pointer devices alongside standalone layers
+        document.getElementById('hand-0').addEventListener('click', (e) => {
+            const btn = e.target.closest('.card-btn');
+            if (!btn || !isDrawState) return;
+            
+            const idx = parseInt(btn.getAttribute('data-card-idx'));
+            cardHeldStates[idx] = !cardHeldStates[idx];
+            
+            // Sync structural visual pointers index matching layout configurations
+            activeFocusIndex = Array.from(interactableElements).indexOf(btn);
+            
+            renderAllHands();
         });
 
-        // 2. Handle primary game progression loop from the main Action Button
-        document.getElementById('btn-deal').addEventListener('click', () => {
-            handleAction();
+        actionButton.addEventListener('click', () => {
+            activeFocusIndex = interactableElements.indexOf(actionButton);
+            executeAction();
         });
 
-        // Run setup
-        initGame();
+        // Bridge Hardware Keyboards, Remotes and Meta Neural Wristband Event Dispatches
+        window.addEventListener('keydown', (event) => {
+            // Suppress browser baseline container window displacements while operating wearable runtime
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space', ' '].includes(event.key)) {
+                event.preventDefault();
+            }
+
+            if (overlay.style.display !== 'none') return;
+
+            if (event.key === 'ArrowRight') {
+                // Neural band swipe forward moves navigation focus ring down list sequence maps
+                activeFocusIndex = (activeFocusIndex + 1) % interactableElements.length;
+                interactableElements[activeFocusIndex].focus();
+            } 
+            else if (event.key === 'ArrowLeft') {
+                // Neural band swipe backward shifts navigation focus ring up list sequence maps
+                activeFocusIndex = (activeFocusIndex - 1 + interactableElements.length) % interactableElements.length;
+                interactableElements[activeFocusIndex].focus();
+            }
+            else if (event.key === 'Enter') {
+                // Meta Glasses hardware translates the "Index Pinch" gesture directly into an Enter key event.
+                // Fire programmatic activation trigger directly onto targeted focus vector item
+                if (interactableElements[activeFocusIndex]) {
+                    interactableElements[activeFocusIndex].click();
+                }
+            }
+            else if (event.key === ' ' || event.key === 'Spacebar') {
+                // Standard desktop developer fallback space trigger mappings
+                if (interactableElements[activeFocusIndex]) {
+                    interactableElements[activeFocusIndex].click();
+                }
+            }
+        });
     </script>
 </body>
 </html>
